@@ -141,6 +141,8 @@ namespace System.ServiceModel.Channels.Http
 
 			string pname = HttpResponseMessageProperty.Name;
 			bool suppressEntityBody = false;
+			if (msg.IsFault)
+				Context.Response.StatusCode = 500;
 			if (msg.Properties.ContainsKey (pname)) {
 				HttpResponseMessageProperty hp = (HttpResponseMessageProperty) msg.Properties [pname];
 				string contentType = hp.Headers ["Content-Type"];
@@ -153,8 +155,6 @@ namespace System.ServiceModel.Channels.Http
 				if (hp.SuppressEntityBody)
 					suppressEntityBody = true;
 			}
-			if (msg.IsFault)
-				Context.Response.StatusCode = 500;
 			if (!suppressEntityBody) {
 				Context.Response.SetLength (ms.Length);
 				Context.Response.OutputStream.Write (ms.GetBuffer (), 0, (int) ms.Length);
