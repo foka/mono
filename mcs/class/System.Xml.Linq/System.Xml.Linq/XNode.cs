@@ -83,6 +83,7 @@ namespace System.Xml.Linq
 			XmlWriterSettings s = new XmlWriterSettings ();
 			s.ConformanceLevel = ConformanceLevel.Auto;
 			s.Indent = options != SaveOptions.DisableFormatting;
+			s.OmitXmlDeclaration = true;
 			XmlWriter xw = XmlWriter.Create (sw, s);
 			WriteTo (xw);
 			xw.Close ();
