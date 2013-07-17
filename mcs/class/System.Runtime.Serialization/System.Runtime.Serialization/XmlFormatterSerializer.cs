@@ -128,7 +128,7 @@ namespace System.Runtime.Serialization
 						explicityType = true;
 				}
 
-				if (explicityType && (map == null || map.OutputXsiType)) {
+				if (explicityType && (map == null || map.OutputXsiType || type == typeof(object))) {
 					QName qname = resolvedQName ?? types.GetXmlName (actualType);
 					string name = qname.Name;
 					string ns = qname.Namespace;
