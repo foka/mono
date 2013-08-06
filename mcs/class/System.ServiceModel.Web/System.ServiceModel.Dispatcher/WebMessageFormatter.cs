@@ -456,7 +456,8 @@ namespace System.ServiceModel.Dispatcher
 					writer.WriteStartElement ("root");
 					writer.WriteAttributeString ("type", "object");
 				}
-				WriteObject (serializer, writer, value);
+				if (serializer != null)
+					WriteObject (serializer, writer, value);
 				if (name != null)
 					writer.WriteEndElement ();
 			}
@@ -465,7 +466,8 @@ namespace System.ServiceModel.Dispatcher
 			{
 				if (name != null)
 					writer.WriteStartElement (name, ns);
-				WriteObject (serializer, writer, value);
+				if (serializer != null)
+					WriteObject (serializer, writer, value);
 				if (name != null)
 					writer.WriteEndElement ();
 			}
