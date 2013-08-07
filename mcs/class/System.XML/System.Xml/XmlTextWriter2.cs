@@ -398,11 +398,11 @@ namespace System.Xml
 
 		public override string LookupPrefix (string ns)
 		{
-			if (ns == null || ns == String.Empty)
-				throw ArgumentError ("The Namespace cannot be empty.");
-
 			if (ns == nsmanager.DefaultNamespace)
 				return String.Empty;
+
+			if (ns == null || ns == String.Empty)
+				throw ArgumentError ("The Namespace cannot be empty.");
 
 			string prefix = nsmanager.LookupPrefixExclusive (
 				ns, false);
