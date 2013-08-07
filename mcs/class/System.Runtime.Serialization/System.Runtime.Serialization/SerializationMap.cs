@@ -439,12 +439,10 @@ namespace System.Runtime.Serialization
 
 		internal void Initialize ()
 		{
+			IsReference = GetIsReference();
+
 			Type type = RuntimeType;
 			List <DataMemberInfo> members;
-			object [] atts = type.GetCustomAttributes (
-				typeof (DataContractAttribute), false);
-			IsReference = atts.Length > 0 ? (((DataContractAttribute) atts [0]).IsReference) : false;
-
 			while (type != null) {
 				members = GetMembers (type);
 				members.Sort (DataMemberInfo.DataMemberInfoComparer.Instance);
@@ -453,6 +451,19 @@ namespace System.Runtime.Serialization
 
 				type = type.BaseType;
 			}
+		}
+
+		private bool GetIsReference()
+		{
+			Type type = RuntimeType;
+			while (type != null)
+			{
+				object[] attributes = type.GetCustomAttributes(typeof(DataContractAttribute), false);
+				if (attributes.Length > 0 && ((DataContractAttribute)attributes[0]).IsReference)
+					return true;
+				type = type.BaseType;
+			}
+			return false;
 		}
 
 		List<DataMemberInfo> GetMembers (Type type)
