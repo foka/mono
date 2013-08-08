@@ -71,7 +71,7 @@ namespace System.Runtime.Serialization
 			if (Type != null)
 				return new Type [] {Type};
 			else {
-				var mi = type.GetMethod (MethodName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static, null, Type.EmptyTypes, null);
+				var mi = type.GetMethod (MethodName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.FlattenHierarchy, null, Type.EmptyTypes, null);
 				if (mi == null)
 					throw new InvalidDataContractException (String.Format ("KnownTypeAttribute on {0} specifies '{1}' method, but that does not exist. The methos must be static.", type, MethodName));
 				if (!typeof (IEnumerable<Type>).IsAssignableFrom (mi.ReturnType))
