@@ -424,7 +424,7 @@ public sealed class TypeDescriptor
 			throw new ArgumentNullException ("type");
 		
 		Type converterType = null;
-		AttributeCollection atts = GetAttributes (type);
+		AttributeCollection atts = TypeDescriptor.GetProvider(type).GetTypeDescriptor(type).GetAttributes();
 		TypeConverterAttribute tca = (TypeConverterAttribute) atts[typeof(TypeConverterAttribute)];
 		if (tca != null && tca.ConverterTypeName.Length > 0)
 			converterType = GetTypeFromName (null, tca.ConverterTypeName);
