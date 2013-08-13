@@ -268,6 +268,11 @@ namespace System.Runtime.Serialization
 			string dnsb = KnownTypeCollection.DefaultClrNamespaceBase;
 			string clrns = ns.StartsWith (dnsb, StringComparison.Ordinal) ?  ns.Substring (dnsb.Length) : ns;
 
+			// When ns=="" we return first type with matching name,
+			// but first we store it and continue to scan all the types in order to
+			// throw an exception when another type with the same name is found.
+			Type firstTypeFoundForEmptyNamespace = null;
+			
 			foreach (var ass in AppDomain.CurrentDomain.GetAssemblies ()) {
 				Type [] types;
 
@@ -295,10 +300,29 @@ namespace System.Runtime.Serialization
 						continue;
 					}
 
+					if (clrns == string.Empty && t.Name == name)
+					{
+						if (firstTypeFoundForEmptyNamespace == null)
+						{
+							firstTypeFoundForEmptyNamespace = t;
+							continue;
+						}
+						else
+						{
+							throw new XmlException(String.Format(
+									"Multiple types found for name: {0} with empty namespace ({1}, {2}).",
+									name, firstTypeFoundForEmptyNamespace.FullName, t.FullName));
+						}
+					}
+
 					if (clrns != null && t.Name == name && t.Namespace == clrns)
 						return makeArray ? t.MakeArrayType () : t;
 				}
 			}
+
+			if (firstTypeFoundForEmptyNamespace != null)
+				return makeArray ? firstTypeFoundForEmptyNamespace.MakeArrayType() : firstTypeFoundForEmptyNamespace;
+
 			throw new XmlException (String.Format ("Type not found; name: {0}, namespace: {1}", name, ns));
 		}
 	}
