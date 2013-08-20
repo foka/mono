@@ -31,7 +31,6 @@ namespace System.ServiceModel.Dispatcher
 					// For this kind of "outsider" exceptions are actually left thrown
 					// (and could even cause server loop crash in .NET).
 
-					Console.WriteLine ("Exception " + e.Message + " " + e.StackTrace);
 					mrc.ProcessingException = e;
 					error_handlers_chain.ProcessRequestChain (mrc);
 				}
