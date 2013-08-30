@@ -176,7 +176,7 @@ namespace System.ServiceModel.Dispatcher
 			if (fe != null && IsGenericFaultException (fe.GetType (), out gft)) {
 				foreach (var fci in mrc.Operation.FaultContractInfos) {
 					if (fci.Detail == gft)
-						return Message.CreateMessage (req.Version, fe.CreateMessageFault (), fci.Action);
+						return Message.CreateMessage (req.Version, fe.CreateMessageFault (), "urn:"+fci.Action);
 				}
 			}
 
