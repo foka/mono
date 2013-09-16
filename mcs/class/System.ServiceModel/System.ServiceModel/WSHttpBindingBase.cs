@@ -156,7 +156,6 @@ namespace System.ServiceModel
 		public override BindingElementCollection
 			CreateBindingElements ()
 		{
-			BindingElement tx = new TransactionFlowBindingElement (TransactionProtocol.WSAtomicTransactionOctober2004);
 			SecurityBindingElement sec = CreateMessageSecurity ();
 			BindingElement msg = null;
 			MessageVersion msgver = MessageVersion.CreateVersion (EnvelopeVersion, AddressingVersion.WSAddressing10);
@@ -172,7 +171,6 @@ namespace System.ServiceModel
 			}
 			BindingElement tr = GetTransport ();
 			List<BindingElement> list = new List<BindingElement> ();
-			list.Add (tx); // it is always added.
 			if (sec != null)
 				list.Add (sec);
 			list.Add (msg);
