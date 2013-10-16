@@ -239,8 +239,10 @@ namespace System.Net.NetworkInformation {
 		{
 			var interfaces = new Dictionary <string, LinuxNetworkInterface> ();
 			IntPtr ifap;
-			if (getifaddrs (out ifap) != 0)
-				throw new SystemException ("getifaddrs() failed");
+			if (getifaddrs (out ifap) != 0) {
+				var msg = string.Format ("getifaddrs() failed (win errno: {0})", Marshal.GetLastWin32Error ());
+				throw new SystemException (msg);
+			}
 
 			try {
 				IntPtr next = ifap;
