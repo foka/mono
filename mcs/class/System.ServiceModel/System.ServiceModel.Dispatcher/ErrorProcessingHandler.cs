@@ -26,19 +26,33 @@ namespace System.ServiceModel.Dispatcher
 				if (handler.HandleError (ex))
 					break;
 
-			// FIXME: remove them. FaultConverter also covers errors like EndpointNotFoundException, which this handler never covers. And checking converter twice is extraneous, so this part is just extraneous.
-			// FIXME: actually everything is done in OperationInvokerHandler now...
-			FaultConverter fc = FaultConverter.GetDefaultFaultConverter (dispatchRuntime.ChannelDispatcher.MessageVersion);
-			Message res = null;			
-			if (!fc.TryCreateFaultMessage (ex, out res))
-				throw ex;
-			mrc.ReplyMessage = res;
+			mrc.ReplyMessage = OperationInvokerHandler.BuildExceptionMessage (mrc, ex, dispatchRuntime.ChannelDispatcher.IncludeExceptionDetailInFaults);
+			Reply(mrc);
+
+			return false;
+		}
+
+		private void Reply(MessageProcessingContext mrc)
+		{
+			SetMessageProcessingContextOperation(mrc);
+
+			if (mrc.Operation.IsOneWay)
+				return;
 
 			if (duplex != null)
 				mrc.Reply (duplex, true);
 			else
 				mrc.Reply (true);
-			return false;
-		}		
+		}
+
+		private static void SetMessageProcessingContextOperation(MessageProcessingContext mrc)
+		{
+			DispatchRuntime dispatchRuntime = mrc.OperationContext.EndpointDispatcher.DispatchRuntime;
+			if (mrc.Operation == null)
+			{
+				DispatchOperation operation = OperationInvokerHandler.GetOperation(mrc.IncomingMessage, dispatchRuntime);
+				mrc.Operation = operation;
+			}
+		}
 	}
 }
