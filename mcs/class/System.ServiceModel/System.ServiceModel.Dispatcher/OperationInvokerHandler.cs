@@ -69,7 +69,7 @@ namespace System.ServiceModel.Dispatcher
 				mrc.Reply (useTimeout);
 		}
 
-		DispatchOperation GetOperation (Message input, DispatchRuntime dispatchRuntime)
+		internal static DispatchOperation GetOperation (Message input, DispatchRuntime dispatchRuntime)
 		{
 			if (dispatchRuntime.OperationSelector != null) {
 				string name = dispatchRuntime.OperationSelector.SelectOperation (ref input);
@@ -142,7 +142,7 @@ namespace System.ServiceModel.Dispatcher
 				h.ChannelFaulted (dcc);
 		}
 
-		bool IsGenericFaultException (Type type, out Type arg)
+		static bool IsGenericFaultException (Type type, out Type arg)
 		{
 			for (; type != null; type = type.BaseType) {
 				if (!type.IsGenericType)
@@ -158,7 +158,7 @@ namespace System.ServiceModel.Dispatcher
 			return false;
 		}
 
-		Message BuildExceptionMessage (MessageProcessingContext mrc, Exception ex, bool includeDetailsInFault)
+		internal static Message BuildExceptionMessage (MessageProcessingContext mrc, Exception ex, bool includeDetailsInFault)
 		{
 			var dr = mrc.OperationContext.EndpointDispatcher.DispatchRuntime;
 			var cd = dr.ChannelDispatcher;
@@ -171,12 +171,20 @@ namespace System.ServiceModel.Dispatcher
 
 			var req = mrc.IncomingMessage;
 
-			Type gft;
 			var fe = ex as FaultException;
-			if (fe != null && IsGenericFaultException (fe.GetType (), out gft)) {
-				foreach (var fci in mrc.Operation.FaultContractInfos) {
-					if (fci.Detail == gft)
-						return Message.CreateMessage (req.Version, fe.CreateMessageFault (), "urn:"+fci.Action);
+			if (fe != null)
+			{
+				Type gft;
+				if (IsGenericFaultException (fe.GetType (), out gft))
+				{
+					foreach (var fci in mrc.Operation.FaultContractInfos) {
+						if (fci.Detail == gft)
+							return Message.CreateMessage (req.Version, fe.CreateMessageFault (), "urn:"+fci.Action);
+					}
+				}
+				else
+				{
+					return Message.CreateMessage (req.Version, fe.CreateMessageFault (), req.Version.Addressing.FaultNamespace);
 				}
 			}
 
