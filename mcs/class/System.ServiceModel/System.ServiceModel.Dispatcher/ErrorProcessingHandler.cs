@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ServiceModel.Channels.Http;
 using System.Text;
 using System.ServiceModel.Channels;
 using System.ServiceModel;
@@ -26,8 +27,27 @@ namespace System.ServiceModel.Dispatcher
 				if (handler.HandleError (ex))
 					break;
 
-			mrc.ReplyMessage = OperationInvokerHandler.BuildExceptionMessage (mrc, ex, dispatchRuntime.ChannelDispatcher.IncludeExceptionDetailInFaults);
-			Reply(mrc);
+			var isExceptionFromReply = HeadersSent(mrc.OperationContext.RequestContext);
+			if (! isExceptionFromReply)
+			{
+				mrc.ReplyMessage = OperationInvokerHandler.BuildExceptionMessage (mrc, ex, dispatchRuntime.ChannelDispatcher.IncludeExceptionDetailInFaults);
+				Reply(mrc);
+			}
+
+			return false;
+		}
+
+		private static bool HeadersSent(RequestContext requestContext)
+		{
+			var httpRequestContext = requestContext as HttpRequestContext;
+			if (httpRequestContext == null)
+				return false;
+
+			var httpStandaloneResponseInfo = httpRequestContext.Context.Response as HttpStandaloneResponseInfo;
+			if (httpStandaloneResponseInfo != null)
+			{
+				return httpStandaloneResponseInfo.HeadersSent;
+			}
 
 			return false;
 		}

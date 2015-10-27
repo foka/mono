@@ -302,6 +302,11 @@ namespace System.ServiceModel.Channels.Http
 		{
 			res.ContentLength64 = value;
 		}
+
+		public bool HeadersSent
+		{
+			get { return res.HeadersSent; }
+		}
 	}
 
 	class AspNetHttpResponseInfo : HttpResponseInfo
