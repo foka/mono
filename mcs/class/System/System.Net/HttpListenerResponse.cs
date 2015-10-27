@@ -50,7 +50,7 @@ namespace System.Net {
 		bool chunked;
 		HttpListenerContext context;
 		
-		internal bool HeadersSent;
+		public bool HeadersSent { get; internal set; }
 		internal object headers_lock = new object ();
 		
 		bool force_close_chunked;
